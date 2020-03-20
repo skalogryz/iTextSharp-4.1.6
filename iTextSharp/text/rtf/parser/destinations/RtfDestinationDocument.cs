@@ -450,6 +450,20 @@ namespace iTextSharp.text.rtf.parser.destinations {
                 if (ctrlWordData.ctrlWord.Equals("cldglu")) /* */ {}
                 if (ctrlWordData.ctrlWord.Equals("cldgll")) /* */ {}
                 if (ctrlWordData.ctrlWord.Equals("")) /* */ {}
+                
+                
+                /* additional stuff, from RTF 1.4+ */
+                if (ctrlWordData.ctrlWord.Equals("xmlnstbl")) {
+                    this.rtfParser.SetTokeniserStateSkipGroup(); result = true;
+                }
+                if (ctrlWordData.ctrlWord.Equals("xmlns")) { this.rtfParser.SetTokeniserStateSkipGroup(); result = true; }
+                if (ctrlWordData.ctrlWord.Equals("wgrffmtfilter")) {
+                    this.rtfParser.SetTokeniserStateSkipGroup(); result = true;
+                }
+                if (ctrlWordData.ctrlWord.Equals("template"))
+                {
+                    this.rtfParser.SetTokeniserStateSkipGroup(); result = true;
+                }
             }
             if (ctrlWordData.ctrlWordType == RtfCtrlWordType.TOGGLE) {
                 this.rtfParser.GetState().properties.ToggleProperty(ctrlWordData);//ctrlWordData.specialHandler);
