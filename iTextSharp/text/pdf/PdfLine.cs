@@ -93,9 +93,14 @@ namespace iTextSharp.text.pdf {
         protected internal float originalWidth;
     
         protected internal bool isRTL = false;
-    
+
+        // if true, Height of the line returned includes all chunks height
+        // otheriwse it just returns fixed height
+        protected internal bool useChunksHeight = true;
+        protected internal float heightMultiplier = 1.2f; // "Single" spacing = 117% (from here: https://practicaltypography.com/line-spacing.html)
+
         // constructors
-    
+
         /**
          * Constructs a new <CODE>PdfLine</CODE>-object.
          *
@@ -104,7 +109,7 @@ namespace iTextSharp.text.pdf {
          * @param    alignment    the alignment of the line
          * @param    height        the height of the line
          */
-    
+
         internal PdfLine(float left, float right, int alignment, float height) {
             this.left = left;
             this.width = right - left;
@@ -238,8 +243,28 @@ namespace iTextSharp.text.pdf {
     
         internal float Height {
             get {
+                if (useChunksHeight) return Math.Max(height, GetMaxChunkHeight())*heightMultiplier;
                 return height;
             }
+        }
+
+        /**
+         * returns the maximum height of a the chunks used
+         */
+        public float GetMaxChunkHeight()
+        {
+            float result = 0;
+            foreach (PdfChunk ck in line)
+            {
+                if (ck.IsImage())
+                    result = Math.Max(result, ck.Image.ScaledHeight + ck.ImageOffsetY);
+                else
+                {
+                    PdfFont font = ck.Font;
+                    result = Math.Max(result, font.Size);
+                }
+            }
+            return result;
         }
     
         /**
@@ -535,5 +560,17 @@ namespace iTextSharp.text.pdf {
                 return descender;
             }
         }
+
+        public bool UseChunksHeight
+        {
+            get { return useChunksHeight; }
+            set { useChunksHeight = value;  }
+        }
+        public float HeightMultiplier
+        {
+            get { return heightMultiplier; }
+            set { heightMultiplier = value; }
+        }
+
     }
 }
