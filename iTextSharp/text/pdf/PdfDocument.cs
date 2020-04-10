@@ -314,6 +314,9 @@ namespace iTextSharp.text.pdf {
         
         /** This represents the leading of the lines. */
         protected internal float leading = 0;
+
+        protected internal bool useLinesHeight = true;
+        protected internal float heightMultiplier = 1.00f;
         
         /**
         * Getter for the current leading.
@@ -462,6 +465,14 @@ namespace iTextSharp.text.pdf {
                     alignment = paragraph.Alignment;
                     leading = paragraph.TotalLeading;
                     
+                    useLinesHeight = paragraph.MultipliedLeading > 0;
+                        if (!useLinesHeight)
+                            heightMultiplier = 1.0f;
+                        else
+                        {
+                            heightMultiplier = paragraph.MultipliedLeading; // word line spacing
+                        }
+
                     CarriageReturn();
                     // we don't want to make orphans/widows
                     if (currentHeight + line.Height + leading > IndentTop - IndentBottom) {
@@ -1179,7 +1190,10 @@ namespace iTextSharp.text.pdf {
                 indentation.imageIndentLeft = 0;
             }
             // a new current line is constructed
+            // need to know paragraph settings
             line = new PdfLine(IndentLeft, IndentRight, alignment, leading);
+            line.UseChunksHeight = useLinesHeight;
+            line.HeightMultiplier = heightMultiplier;
         }
         
         /**

@@ -243,28 +243,14 @@ namespace iTextSharp.text.pdf {
     
         internal float Height {
             get {
-                if (useChunksHeight) return Math.Max(height, GetMaxChunkHeight())*heightMultiplier;
+                if (useChunksHeight)
+                {
+                    float[] mx = GetMaxSize();
+                    float result = Math.Max(mx[0] * heightMultiplier, mx[1]);
+                    return Math.Max(height, result);
+                }
                 return height;
             }
-        }
-
-        /**
-         * returns the maximum height of a the chunks used
-         */
-        public float GetMaxChunkHeight()
-        {
-            float result = 0;
-            foreach (PdfChunk ck in line)
-            {
-                if (ck.IsImage())
-                    result = Math.Max(result, ck.Image.ScaledHeight + ck.ImageOffsetY);
-                else
-                {
-                    PdfFont font = ck.Font;
-                    result = Math.Max(result, font.Size);
-                }
-            }
-            return result;
         }
     
         /**
