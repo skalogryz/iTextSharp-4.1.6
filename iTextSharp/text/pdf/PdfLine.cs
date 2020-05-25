@@ -290,7 +290,15 @@ namespace iTextSharp.text.pdf {
          */
     
         public bool HasToBeJustified() {
-            return ((alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL) && width != 0);
+            return ((alignment == Element.ALIGN_JUSTIFIED 
+                  || alignment == Element.ALIGN_JUSTIFIED_ALL
+                  || alignment == Element.ALIGN_JUSTIFIED_WORDS
+                  ) && width != 0);
+        }
+
+        public bool IsWordJustify()
+        {
+            return (alignment == Element.ALIGN_JUSTIFIED_WORDS);
         }
     
         /**
@@ -301,7 +309,9 @@ namespace iTextSharp.text.pdf {
          */
     
         public void ResetAlignment() {
-            if (alignment == Element.ALIGN_JUSTIFIED) {
+            if ((alignment == Element.ALIGN_JUSTIFIED)
+                ||(alignment == Element.ALIGN_JUSTIFIED_WORDS))
+            {
                 alignment = Element.ALIGN_LEFT;
             }
         }

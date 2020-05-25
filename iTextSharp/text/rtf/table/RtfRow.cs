@@ -340,6 +340,7 @@ namespace iTextSharp.text.rtf.table {
                     break;
                 case Element.ALIGN_JUSTIFIED:
                 case Element.ALIGN_JUSTIFIED_ALL:
+                case Element.ALIGN_JUSTIFIED_WORDS:
                     result.Write(ROW_ALIGN_JUSTIFIED, 0, ROW_ALIGN_JUSTIFIED.Length);
                     break;
             }

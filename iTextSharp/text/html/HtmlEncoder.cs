@@ -196,6 +196,7 @@ namespace iTextSharp.text.html {
                     return HtmlTags.ALIGN_RIGHT;
                 case Element.ALIGN_JUSTIFIED:
                 case Element.ALIGN_JUSTIFIED_ALL:
+                case Element.ALIGN_JUSTIFIED_WORDS:
                     return HtmlTags.ALIGN_JUSTIFIED;
                 case Element.ALIGN_TOP:
                     return HtmlTags.ALIGN_TOP;

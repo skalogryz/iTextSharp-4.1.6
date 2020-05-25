@@ -288,6 +288,7 @@ namespace iTextSharp.text.rtf.graphic {
                         result.Write(RtfParagraphStyle.ALIGN_CENTER, 0, RtfParagraphStyle.ALIGN_CENTER.Length);
                         break;
                     case Element.ALIGN_JUSTIFIED:
+                    case Element.ALIGN_JUSTIFIED_WORDS:
                         result.Write(RtfParagraphStyle.ALIGN_JUSTIFY, 0, RtfParagraphStyle.ALIGN_JUSTIFY.Length);
                         break;
                 }

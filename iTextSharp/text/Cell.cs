@@ -399,6 +399,11 @@ namespace iTextSharp.text {
                 this.HorizontalAlignment = Element.ALIGN_JUSTIFIED_ALL;
                 return;
             }
+            if (Util.EqualsIgnoreCase(alignment, ElementTags.ALIGN_JUSTIFIED_WORDS))
+            {
+                this.HorizontalAlignment = Element.ALIGN_JUSTIFIED_WORDS;
+                return;
+            }
             this.HorizontalAlignment = Element.ALIGN_LEFT;
         }
 

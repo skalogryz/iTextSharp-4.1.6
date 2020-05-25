@@ -1316,6 +1316,9 @@ namespace iTextSharp.text.pdf {
                 glueWidth = line.WidthLeft / separatorCount;
             }
             else if (isJustified) {
+
+                bool isWordJust = line.IsWordJustify();
+
                 if (line.NewlineSplit && line.WidthLeft >= (lastBaseFactor * (ratio * numberOfSpaces + lineLen - 1))) {
                     if (line.RTL) {
                         text.MoveText(line.WidthLeft - lastBaseFactor * (ratio * numberOfSpaces + lineLen - 1), 0);

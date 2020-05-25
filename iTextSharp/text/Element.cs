@@ -251,6 +251,12 @@ namespace iTextSharp.text
         /// </summary>
         public const int ALIGN_JUSTIFIED_ALL = 8;
 
+        /// <summary>
+        /// Does the same as ALIGN_JUSTIFIED by words, leaving characters
+        /// with their "normal" alignment
+        /// </summary>
+        public const int ALIGN_JUSTIFIED_WORDS = 9;
+
         // static member variables for CCITT compression
     
         /// <summary>

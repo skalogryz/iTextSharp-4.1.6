@@ -565,6 +565,7 @@ namespace iTextSharp.text.rtf.style {
                     break;
                 case Element.ALIGN_JUSTIFIED:
                 case Element.ALIGN_JUSTIFIED_ALL:
+                case Element.ALIGN_JUSTIFIED_WORDS:
                     result.Write(t = RtfParagraphStyle.ALIGN_JUSTIFY, 0, t.Length);
                     break;
             }

@@ -400,7 +400,10 @@ namespace iTextSharp.text
     
         /// <summary> the possible value of an alignment attribute </summary>
         public const string ALIGN_JUSTIFIED_ALL = "JustifyAll";
-    
+
+        /// <summary> the possible value of an alignment attribute </summary>
+        public const string ALIGN_JUSTIFIED_WORDS = "JustifyWords";
+
         /// <summary> the possible value of an alignment attribute </summary>
         public const string ALIGN_TOP = "Top";
     
@@ -475,6 +478,7 @@ namespace iTextSharp.text
                     return ALIGN_RIGHT;
                 case Element.ALIGN_JUSTIFIED:
                 case Element.ALIGN_JUSTIFIED_ALL:
+                case Element.ALIGN_JUSTIFIED_WORDS:
                     return ALIGN_JUSTIFIED;
                 case Element.ALIGN_TOP:
                     return ALIGN_TOP;
@@ -511,6 +515,10 @@ namespace iTextSharp.text
             }
             if (Util.EqualsIgnoreCase(ALIGN_JUSTIFIED_ALL, alignment)) {
                 return Element.ALIGN_JUSTIFIED_ALL;
+            }
+            if (Util.EqualsIgnoreCase(ALIGN_JUSTIFIED_WORDS, alignment))
+            {
+                return Element.ALIGN_JUSTIFIED_WORDS;
             }
             if (Util.EqualsIgnoreCase(ALIGN_TOP, alignment)) {
                 return Element.ALIGN_TOP;

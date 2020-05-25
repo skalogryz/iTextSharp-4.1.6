@@ -255,6 +255,11 @@ namespace iTextSharp.text {
                 this.alignment = Element.ALIGN_JUSTIFIED_ALL;
                 return;
             }
+            if (Util.EqualsIgnoreCase(alignment, ElementTags.ALIGN_JUSTIFIED_WORDS))
+            {
+                this.alignment = Element.ALIGN_JUSTIFIED_WORDS;
+                return;
+            }
             this.alignment = Element.ALIGN_LEFT;
         }
     
