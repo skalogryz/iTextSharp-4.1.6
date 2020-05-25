@@ -1319,7 +1319,17 @@ namespace iTextSharp.text.pdf {
 
                 bool isWordJust = line.IsWordJustify();
 
-                if (line.NewlineSplit && line.WidthLeft >= (lastBaseFactor * (ratio * numberOfSpaces + lineLen - 1))) {
+                if (isWordJust)
+                {
+                    if (!line.NewlineSplit) // only do alignment for lines other than the last one
+                    {
+                        float width = line.WidthLeft;
+                        int numSp = numberOfSpaces;
+                        if (numSp == 0) numSp = 1;
+                        baseWordSpacing = width / numSp;
+                    }
+                }
+                else if (line.NewlineSplit && line.WidthLeft >= (lastBaseFactor * (ratio * numberOfSpaces + lineLen - 1))) {
                     if (line.RTL) {
                         text.MoveText(line.WidthLeft - lastBaseFactor * (ratio * numberOfSpaces + lineLen - 1), 0);
                     }
