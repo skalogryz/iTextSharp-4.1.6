@@ -259,6 +259,129 @@ namespace iTextSharp.text.pdf {
             }
         }
 
+        // try to balance out the content of the columns to have equal content length
+        private float getBalanceDesiredHeight(PdfContentByte canvas, PdfDocument document, float documentY)
+        {
+            this.document = document;
+            if (columnDefs.Count == 0)
+            {
+                throw new DocumentException("MultiColumnText has no columns");
+            }
+
+            float origintop = top;
+            float originnextY = nextY;
+            float originDesired = desiredHeight;
+            
+            desiredHeight = -1;
+            float maxHeight = 0; // as much height that's left on the page
+
+            top = document.GetVerticalPosition(true);
+            foreach (ColumnDef cd in columnDefs)
+            {
+                float[] left = cd.ResolvePositions(Rectangle.LEFT_BORDER);
+                float[] right = cd.ResolvePositions(Rectangle.RIGHT_BORDER);
+                maxHeight = Math.Max(maxHeight, GetHeight(left, right));
+            }
+            float measureHeight = maxHeight;
+            float heightAdust = maxHeight / 2.0f;
+
+            float fitHeight = -1;
+            bool firstPass = true;
+
+            while (heightAdust > 0.25)
+            {
+                ColumnText columnText = new ColumnText(canvas);
+                columnText.Canvas = canvas;
+                columnText.SetACopy(this.columnText);
+
+                bool fitAll = false;
+                desiredHeight = measureHeight;
+                top = origintop;
+                nextY = originnextY;
+
+                float currentHeight = 0;
+                bool done = false;
+                while (!done)
+                {
+                    if (top == AUTOMATIC)
+                    {
+                        top = document.GetVerticalPosition(true);
+                    }
+                    else if (nextY == AUTOMATIC)
+                    {
+                        nextY = document.GetVerticalPosition(true); // RS - 07/07/2005 - - Get current doc writing position for top of columns on new page.
+                    }
+
+                    ColumnDef currentDef = (ColumnDef)columnDefs[CurrentColumn];
+                    columnText.YLine = top;
+
+                    float[] left = currentDef.ResolvePositions(Rectangle.LEFT_BORDER);
+                    float[] right = currentDef.ResolvePositions(Rectangle.RIGHT_BORDER);
+                    if (document.IsMarginMirroring() && document.PageNumber % 2 == 0)
+                    {
+                        float delta = document.RightMargin - document.Left;
+                        left = (float[])left.Clone();
+                        right = (float[])right.Clone();
+                        for (int i = 0; i < left.Length; i += 2)
+                        {
+                            left[i] -= delta;
+                        }
+                        for (int i = 0; i < right.Length; i += 2)
+                        {
+                            right[i] -= delta;
+                        }
+                    }
+                    currentHeight = Math.Max(currentHeight, GetHeight(left, right));
+                    if (currentDef.IsSimple())
+                    {
+                        columnText.SetSimpleColumn(left[2], left[3], right[0], right[1]);
+                    }
+                    else
+                    {
+                        columnText.SetColumns(left, right);
+                    }
+                    int result = columnText.Go(true);
+                    if ((result & ColumnText.NO_MORE_TEXT) != 0)
+                    {
+                        done = true;
+                        top = columnText.YLine;
+                        fitAll = true;
+                    }
+                    else if (ShiftCurrentColumn()) // NO_MORE_COLUMN, try to go to the next column
+                    {
+                        top = nextY;
+                    }
+                    else
+                    {   // check if we are done because of height
+                        fitAll = false;  
+                        done = true;
+                    }
+                }
+                ResetCurrentColumn();
+
+                if (fitAll)
+                {
+                    fitHeight = measureHeight;
+                    measureHeight -= heightAdust;
+                }
+                else
+                {
+                    measureHeight += heightAdust;
+
+                    // ok, so we've tried the full length! and it cannot fit.
+                    // leave the current page as is, and we we'll try on the text page
+                    if (firstPass) break; 
+                }
+                heightAdust /= 2.0f;
+                firstPass = false;
+            }
+
+            top = origintop;
+            nextY = originnextY;
+            desiredHeight = originDesired;
+
+            return fitHeight;
+        }
 
         /**
         * Write out the columns.  After writing, use
@@ -275,6 +398,15 @@ namespace iTextSharp.text.pdf {
             if (columnDefs.Count == 0) {
                 throw new DocumentException("MultiColumnText has no columns");
             }
+
+            bool adjustedDesiredHeight = false;
+            float originDesiredHeight = desiredHeight;
+            if ((BalanceContent) && (desiredHeight < 0))
+            {
+                desiredHeight = getBalanceDesiredHeight(canvas, document, documentY);
+                adjustedDesiredHeight = true;
+            }
+
             overflow = false;
             float currentHeight = 0;
             bool done = false;
@@ -319,21 +451,35 @@ namespace iTextSharp.text.pdf {
                 } else {  // check if we are done because of height
                     totalHeight += currentHeight;
 
-                    if ((desiredHeight != AUTOMATIC) && (totalHeight >= desiredHeight)) {
+                    if ((originDesiredHeight != AUTOMATIC) && (totalHeight >= originDesiredHeight))
+                    {
                         overflow = true;
                         break;
                     } else {  // need to start new page and reset the columns
                         documentY = nextY;
                         NewPage();
                         currentHeight = 0;
+
+                        if ((BalanceContent)&&(originDesiredHeight<0))
+                        {
+                            desiredHeight = getBalanceDesiredHeight(canvas, document, documentY);
+                            adjustedDesiredHeight = true;
+                        }
                     }
                 }
             }
+
+            if (adjustedDesiredHeight) desiredHeight = originDesiredHeight;
+
             if (desiredHeight == AUTOMATIC && columnDefs.Count == 1) {
                 currentHeight = documentY - columnText.YLine;
             }
             return currentHeight;
         }
+
+        // if set to TRUE, the columns on (the last page) of its entry
+        // will be written out in equal height 
+        public bool BalanceContent { get; set; }
 
         private void NewPage() {
             ResetCurrentColumn();
